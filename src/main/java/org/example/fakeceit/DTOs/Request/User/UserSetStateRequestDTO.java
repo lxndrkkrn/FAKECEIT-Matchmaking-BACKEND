@@ -1,4 +1,9 @@
 package org.example.fakeceit.DTOs.Request.User;
 
-public record UserSetStateRequestDTO() {
+import org.example.fakeceit.Enum.UserState;
+
+public record UserSetStateRequestDTO(
+        Long id,
+        UserState userState
+) {
 }

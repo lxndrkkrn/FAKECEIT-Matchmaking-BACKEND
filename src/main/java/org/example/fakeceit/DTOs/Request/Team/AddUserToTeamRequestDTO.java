@@ -1,4 +1,7 @@
 package org.example.fakeceit.DTOs.Request.Team;
 
-public record InviteToTeamRequestDTO() {
+public record AddUserToTeamRequestDTO(
+        Long userId,
+        Long teamId
+) {
 }

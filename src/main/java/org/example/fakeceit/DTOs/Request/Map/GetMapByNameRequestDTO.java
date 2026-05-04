@@ -1,4 +1,6 @@
 package org.example.fakeceit.DTOs.Request.Map;
 
-public record GetMapByNameRequestDTO() {
+public record GetMapByNameRequestDTO(
+        String name
+) {
 }

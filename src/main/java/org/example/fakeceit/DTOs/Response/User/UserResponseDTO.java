@@ -1,4 +1,15 @@
 package org.example.fakeceit.DTOs.Response.User;
 
-public record UserResponseDTO() {
+import org.example.fakeceit.Enum.EloLevel;
+
+import java.math.BigDecimal;
+
+public record UserResponseDTO(
+        Long id,
+        String name,
+        BigDecimal balance,
+        Integer elo,
+        EloLevel level,
+        Boolean sub
+) {
 }

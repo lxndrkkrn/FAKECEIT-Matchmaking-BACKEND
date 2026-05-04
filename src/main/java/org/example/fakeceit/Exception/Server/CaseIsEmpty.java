@@ -1,4 +1,4 @@
-package org.example.fakeceit.Errors.Server;
+package org.example.fakeceit.Exception.Server;
 
 public class CaseIsEmpty extends RuntimeException {
     public CaseIsEmpty(String message) {

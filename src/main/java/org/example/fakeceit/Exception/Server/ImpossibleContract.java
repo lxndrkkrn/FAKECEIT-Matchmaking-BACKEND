@@ -1,4 +1,4 @@
-package org.example.fakeceit.Errors.Server;
+package org.example.fakeceit.Exception.Server;
 
 public class ImpossibleContract extends RuntimeException {
     public ImpossibleContract(String message) {

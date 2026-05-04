@@ -1,4 +1,9 @@
 package org.example.fakeceit.DTOs.Request.Elo;
 
-public record TakeEloRequestDTO() {
+import jakarta.validation.constraints.Min;
+
+public record TakeEloRequestDTO(
+        Long id,
+        @Min(1) Integer deltaElo
+) {
 }

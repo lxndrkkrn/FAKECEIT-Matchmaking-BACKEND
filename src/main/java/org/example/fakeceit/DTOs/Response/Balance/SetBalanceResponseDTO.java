@@ -1,4 +1,12 @@
 package org.example.fakeceit.DTOs.Response.Balance;
 
-public record SetBalanceResponseDTO() {
+import org.example.fakeceit.Enum.TransactionBalanceType;
+
+import java.math.BigDecimal;
+
+public record SetBalanceResponseDTO(
+        Long userId,
+        BigDecimal newBalance,
+        TransactionBalanceType transactionBalanceType
+) {
 }

@@ -1,4 +1,6 @@
 package org.example.fakeceit.DTOs.Request.Statistic;
 
-public record ResetStatisticRequestDTO() {
+public record ResetStatisticRequestDTO(
+        Long userId
+) {
 }

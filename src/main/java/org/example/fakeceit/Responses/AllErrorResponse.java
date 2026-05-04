@@ -1,4 +1,4 @@
-package org.example.breakoutdrop.Responses;
+package org.example.fakeceit.Responses;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,6 @@
 package org.example.fakeceit.DTOs.Response.Statistic;
 
-public record AddStatisticResponseDTO() {
+public record AddStatisticResponseDTO(
+        Long userId
+) {
 }

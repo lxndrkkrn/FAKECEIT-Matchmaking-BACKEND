@@ -1,4 +1,11 @@
 package org.example.fakeceit.DTOs.Response.Team;
 
-public record CreateTeamResponseDTO() {
+import java.util.List;
+
+public record CreateTeamResponseDTO(
+        Long id,
+        List<Long> playersId,
+        String name,
+        Long captainId
+) {
 }

@@ -1,4 +1,10 @@
 package org.example.fakeceit.DTOs.Request.Team;
 
-public record SetNameForTeamRequestDTO() {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record SetNameForTeamRequestDTO(
+        @NotNull Long id,
+        @NotNull @NotBlank String name
+) {
 }

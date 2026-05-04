@@ -1,4 +1,4 @@
-package org.example.fakeceit.Errors.Client;
+package org.example.fakeceit.Exception.Client;
 
 public class InvalidValue extends RuntimeException {
     public InvalidValue(String message) {

@@ -1,21 +1,17 @@
-package org.example.breakoutdrop.Controllers;
+package org.example.fakeceit.Controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
-
-import org.example.breakoutdrop.Errors.Client.*;
-import org.example.breakoutdrop.Errors.ClientHTTP.*;
-import org.example.breakoutdrop.Errors.Server.CaseIsEmpty;
-import org.example.breakoutdrop.Errors.Server.ImpossibleContract;
-import org.example.breakoutdrop.Errors.ServerHTTP.NotImplemented501;
-import org.example.breakoutdrop.Errors.ServerHTTP.ServiceUnavailable503;
-import org.example.breakoutdrop.Responses.AllErrorResponse;
+import org.example.fakeceit.Exception.Client.*;
+import org.example.fakeceit.Exception.ClientHTTP.*;
+import org.example.fakeceit.Exception.ServerHTTP.NotImplemented501;
+import org.example.fakeceit.Exception.ServerHTTP.ServiceUnavailable503;
+import org.example.fakeceit.Responses.AllErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
@@ -181,13 +177,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IncorrectEmail.class)
-    public ResponseEntity<AllErrorResponse> handleIncorrectEmail(IncorrectEmail ex) {
+    @ExceptionHandler(IncorrectName.class)
+    public ResponseEntity<AllErrorResponse> handleIncorrectEmail(IncorrectName ex) {
 
         AllErrorResponse errorResponse = new AllErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Incorrect Email",
+                "Incorrect Name",
                 ex.getMessage()
         );
 
@@ -208,75 +204,4 @@ public class GlobalExceptionHandler {
         log.warn("Ошибка пользователя: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
-    @ExceptionHandler(IncorrectURL.class)
-    public ResponseEntity<AllErrorResponse> handleIncorrectURL(IncorrectURL ex) {
-
-        AllErrorResponse errorResponse = new AllErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Incorrect URL",
-                ex.getMessage()
-        );
-
-        log.warn("Ошибка пользователя: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(CaseIsEmpty.class)
-    public ResponseEntity<AllErrorResponse> handleCaseIsEmpty(CaseIsEmpty ex) {
-
-        AllErrorResponse errorResponse = new AllErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                "Case Is Empty",
-                ex.getMessage()
-        );
-
-        log.warn("Ошибка сервера: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    @ExceptionHandler(SameSkin.class)
-    public ResponseEntity<AllErrorResponse> handleSameSkin(SameSkin ex) {
-
-        AllErrorResponse errorResponse = new AllErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Same Skin",
-                ex.getMessage()
-        );
-
-        log.warn("Ошибка пользователя: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidValue.class)
-    public ResponseEntity<AllErrorResponse> handleInvalidValue(InvalidValue ex) {
-
-        AllErrorResponse errorResponse = new AllErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Invalid Value",
-                ex.getMessage()
-        );
-
-        log.warn("Ошибка пользователя: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ImpossibleContract.class)
-    public ResponseEntity<AllErrorResponse> handleImpossibleContract(ImpossibleContract ex) {
-
-        AllErrorResponse errorResponse = new AllErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                "Impossible Contract",
-                ex.getMessage()
-        );
-
-        log.warn("Ошибка сервера: {}; Сообщение: {}", errorResponse.error(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
 }

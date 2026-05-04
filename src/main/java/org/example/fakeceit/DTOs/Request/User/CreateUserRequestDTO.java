@@ -1,4 +1,4 @@
-package org.example.fakeceit.DTOs.Request;
+package org.example.fakeceit.DTOs.Request.User;
 
 import jakarta.validation.Valid;
 

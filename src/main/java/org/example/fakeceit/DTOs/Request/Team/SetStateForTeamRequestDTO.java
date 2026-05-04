@@ -1,4 +1,9 @@
 package org.example.fakeceit.DTOs.Request.Team;
 
-public record SetStateForTeamRequestDTO() {
+import jakarta.validation.constraints.NotNull;
+
+public record SetStateForTeamRequestDTO(
+        @NotNull Long id,
+        @NotNull Boolean state
+) {
 }

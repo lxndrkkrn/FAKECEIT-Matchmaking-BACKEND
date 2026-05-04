@@ -1,4 +1,7 @@
 package org.example.fakeceit.Repositories;
 
-public interface TransactionBalanceRepository {
+import org.example.fakeceit.Entity.TransactionBalance;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TransactionBalanceRepository extends JpaRepository<TransactionBalance, Long> {
 }

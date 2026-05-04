@@ -1,4 +1,4 @@
-package org.example.fakeceit.DTOs.Response;
+package org.example.fakeceit.DTOs.Response.User;
 
 import java.time.LocalDateTime;
 

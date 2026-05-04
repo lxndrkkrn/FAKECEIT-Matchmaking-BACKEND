@@ -1,4 +1,6 @@
 package org.example.fakeceit.DTOs.Response.Map;
 
-public record DeleteMapRequestDTO() {
+public record DeleteMapResponseDTO(
+        Long id
+) {
 }

@@ -1,4 +1,6 @@
 package org.example.fakeceit.DTOs.Request.User;
 
-public record FindUserByIdRequestDTO() {
+public record FindUserByIdRequestDTO(
+        Long id
+) {
 }

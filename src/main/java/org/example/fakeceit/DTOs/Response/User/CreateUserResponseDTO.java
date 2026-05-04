@@ -1,4 +1,6 @@
-package org.example.fakeceit.DTOs.Response;
+package org.example.fakeceit.DTOs.Response.User;
+
+import org.example.fakeceit.Enum.EloLevel;
 
 import java.math.BigDecimal;
 
@@ -7,7 +9,7 @@ public record CreateUserResponseDTO(
         String name,
         BigDecimal balance,
         Integer elo,
-        Integer level,
+        EloLevel level,
         Boolean sub
 ) {
 }
