@@ -2,17 +2,16 @@ package org.example.fakeceit.Service.Domain;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Statistic.AddStatisticRequestDTO;
-import org.example.fakeceit.DTOs.Request.Statistic.GetStatisticRequestDTO;
-import org.example.fakeceit.DTOs.Request.Statistic.ResetStatisticRequestDTO;
-import org.example.fakeceit.DTOs.Response.Statistic.AddStatisticResponseDTO;
-import org.example.fakeceit.DTOs.Response.Statistic.GetStatisticResponseDTO;
-import org.example.fakeceit.DTOs.Response.Statistic.ResetStatisticResponseDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Statistic.AddStatisticRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Statistic.GetStatisticRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Statistic.ResetStatisticRequestDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Statistic.AddStatisticResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Statistic.GetStatisticResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Statistic.ResetStatisticResponseDTO;
 import org.example.fakeceit.Entity.Statistic;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
-import org.example.fakeceit.Repositories.StatisticRepository;
 import org.example.fakeceit.Repositories.TeamRepository;
 import org.example.fakeceit.Repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -23,13 +22,13 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class StatisticService {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
 
-    @Transactional
     public AddStatisticResponseDTO addStatistic(AddStatisticRequestDTO addStatisticRequestDTO) {
         log.info("Попытка обновления статистики игроку");
 
@@ -49,7 +48,6 @@ public class StatisticService {
         );
     }
 
-    @Transactional
     public ResetStatisticResponseDTO resetStatistic(ResetStatisticRequestDTO resetStatisticRequestDTO) {
         log.info("Попытка сброса статистики");
 

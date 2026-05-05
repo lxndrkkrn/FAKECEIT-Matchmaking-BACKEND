@@ -3,14 +3,14 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Map.CreateMapRequestDTO;
-import org.example.fakeceit.DTOs.Request.Map.DeleteMapRequestDTO;
-import org.example.fakeceit.DTOs.Request.Map.GetMapByIdRequestDTO;
-import org.example.fakeceit.DTOs.Request.Map.GetMapByNameRequestDTO;
-import org.example.fakeceit.DTOs.Response.Map.CreateMapResponseDTO;
-import org.example.fakeceit.DTOs.Response.Map.DeleteMapResponseDTO;
-import org.example.fakeceit.DTOs.Response.Map.GetMapResponseDTO;
-import org.example.fakeceit.Entity.Map;
+import org.example.fakeceit.DTOs.Request.Domain.Map.CreateMapRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Map.DeleteMapRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Map.GetMapByIdRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Map.GetMapByNameRequestDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Map.CreateMapResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Map.DeleteMapResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Map.GetMapResponseDTO;
+import org.example.fakeceit.Entity.GameMap;
 import org.example.fakeceit.Exception.Client.IncorrectName;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
 import org.example.fakeceit.Repositories.MapRepository;
@@ -22,12 +22,12 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class MapService {
 
     private final MapRepository mapRepository;
 
-    @Transactional
     public CreateMapResponseDTO createMap(@Valid CreateMapRequestDTO createMapRequestDTO) {
         log.info("Попытка создания карты");
 
@@ -35,34 +35,33 @@ public class MapService {
             throw new IncorrectName("Это имя уже занято");
         }
 
-        Map map = new Map();
+        GameMap gameMap = new GameMap();
 
-        map.setName(createMapRequestDTO.name());
-        map.setIconImg(createMapRequestDTO.iconImg());
-        map.setBackgroundImg(createMapRequestDTO.backgroundImg());
-        map.setBannerImg(createMapRequestDTO.bannerImg());
+        gameMap.setName(createMapRequestDTO.name());
+        gameMap.setIconImg(createMapRequestDTO.iconImg());
+        gameMap.setBackgroundImg(createMapRequestDTO.backgroundImg());
+        gameMap.setBannerImg(createMapRequestDTO.bannerImg());
 
-        mapRepository.save(map);
+        mapRepository.save(gameMap);
 
         return new CreateMapResponseDTO(
-                map.getId(),
-                map.getName(),
-                map.getIconImg(),
-                map.getBackgroundImg(),
-                map.getBannerImg()
+                gameMap.getId(),
+                gameMap.getName(),
+                gameMap.getIconImg(),
+                gameMap.getBackgroundImg(),
+                gameMap.getBannerImg()
         );
     }
 
-    @Transactional
     public DeleteMapResponseDTO deleteMap(@Valid DeleteMapRequestDTO deleteMapRequestDTO) {
         log.info("Попытка удаления карты");
 
-        Map map = mapRepository.findById(deleteMapRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
+        GameMap gameMap = mapRepository.findById(deleteMapRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
 
-        mapRepository.delete(map);
+        mapRepository.delete(gameMap);
 
         return new DeleteMapResponseDTO(
-                map.getId()
+                gameMap.getId()
         );
     }
 
@@ -70,14 +69,14 @@ public class MapService {
     public GetMapResponseDTO getMapById(@Valid GetMapByIdRequestDTO getMapByIdRequestDTO) {
         log.info("Попытка получения информации о карте по ID");
 
-        Map map = mapRepository.findById(getMapByIdRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
+        GameMap gameMap = mapRepository.findById(getMapByIdRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
 
         return new GetMapResponseDTO(
-                map.getId(),
-                map.getName(),
-                map.getIconImg(),
-                map.getBackgroundImg(),
-                map.getBannerImg()
+                gameMap.getId(),
+                gameMap.getName(),
+                gameMap.getIconImg(),
+                gameMap.getBackgroundImg(),
+                gameMap.getBannerImg()
         );
     }
 
@@ -85,14 +84,14 @@ public class MapService {
     public GetMapResponseDTO getMapByName(@Valid GetMapByNameRequestDTO getMapByNameRequestDTO) {
         log.info("Попытка получения информации о карте по названию");
 
-        Map map = mapRepository.findByName(getMapByNameRequestDTO.name()).orElseThrow(() -> new NotFound404("Карта не найдена"));
+        GameMap gameMap = mapRepository.findByName(getMapByNameRequestDTO.name()).orElseThrow(() -> new NotFound404("Карта не найдена"));
 
         return new GetMapResponseDTO(
-                map.getId(),
-                map.getName(),
-                map.getIconImg(),
-                map.getBackgroundImg(),
-                map.getBannerImg()
+                gameMap.getId(),
+                gameMap.getName(),
+                gameMap.getIconImg(),
+                gameMap.getBackgroundImg(),
+                gameMap.getBannerImg()
         );
     }
 

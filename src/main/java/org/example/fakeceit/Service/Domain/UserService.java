@@ -3,8 +3,8 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.User.*;
-import org.example.fakeceit.DTOs.Response.User.*;
+import org.example.fakeceit.DTOs.Request.Domain.User.*;
+import org.example.fakeceit.DTOs.Response.Domain.User.*;
 import org.example.fakeceit.Entity.Statistic;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.Client.IncorrectName;
@@ -21,13 +21,13 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class UserService {
 
     private final UserRepository userRepository;
     private final StatisticRepository statisticRepository;
 
-    @Transactional
     public CreateUserResponseDTO createUser(@Valid CreateUserRequestDTO createUserRequestDTO) {
         log.info("Попытка создания пользователя");
 
@@ -58,7 +58,6 @@ public class UserService {
         return createUserResponseDTO;
     }
 
-    @Transactional
     public DeleteUserResponseDTO deleteUser(@Valid DeleteUserRequestDTO deleteUserRequestDTO) {
         log.info("Попытка удаления пользователя с ID: {}", deleteUserRequestDTO.id());
 
@@ -78,7 +77,6 @@ public class UserService {
         return deleteUserResponseDTO;
     }
 
-    @Transactional
     public ChangeNameResponseDTO changeName(@Valid ChangeNameRequestDTO changeNameRequestDTO) {
         log.info("Попытка изменения имени пользователю с ID: {}", changeNameRequestDTO.id());
 
@@ -92,14 +90,11 @@ public class UserService {
                 LocalDateTime.now()
         );
 
-        userRepository.delete(user);
-
         log.info("Имя пользователю с ID: {} изменено", changeNameRequestDTO.id());
 
         return changeNameResponseDTO;
     }
 
-    @Transactional
     public ChangePasswordResponseDTO changePass(@Valid ChangePasswordRequestDTO changePasswordRequestDTO) {
         log.info("Попытка изменения пароля пользователю с ID: {}", changePasswordRequestDTO.id());
 
@@ -113,8 +108,6 @@ public class UserService {
                 user.getName(),
                 LocalDateTime.now()
         );
-
-        userRepository.delete(user);
 
         log.info("Пароль пользователю с ID: {} изменен", changePasswordRequestDTO.id());
 
@@ -149,7 +142,6 @@ public class UserService {
         );
     }
 
-    @Transactional
     public UserSetStateResponseDTO setUserState(UserSetStateRequestDTO setStateRequestDTO) {
         log.info("Попытка установить статус пользователю");
         User user = findUserById(setStateRequestDTO.id());
@@ -162,7 +154,7 @@ public class UserService {
         );
     }
 
-    @Transactional
+
     public SetUserSubResponseDTO setUserSub(SetUserSubRequestDTO setUserSubRequestDTO) {
         log.info("Попытка установить подписку пользователю");
         User user = findUserById(setUserSubRequestDTO.id());
@@ -175,7 +167,7 @@ public class UserService {
         );
     }
 
-    private User findUserById(Long id) {
+    public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
     }
 

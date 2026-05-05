@@ -1,0 +1,39 @@
+package org.example.fakeceit.Entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "invites")
+@Data
+
+public class Invite {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "inviter_id")
+    private User inviter;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "invited_id")
+    private User invited;
+
+    @NotNull
+    private LocalDateTime inviteDate = LocalDateTime.now();
+
+    @NotNull
+    private LocalDateTime finishInviteDate = LocalDateTime.now().plusMinutes(5);
+}

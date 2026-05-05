@@ -6,7 +6,7 @@ import org.example.fakeceit.Exception.Client.*;
 import org.example.fakeceit.Exception.ClientHTTP.*;
 import org.example.fakeceit.Exception.ServerHTTP.NotImplemented501;
 import org.example.fakeceit.Exception.ServerHTTP.ServiceUnavailable503;
-import org.example.fakeceit.Responses.AllErrorResponse;
+import org.example.fakeceit.ExceptionResponse.AllErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -3,14 +3,14 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Balance.AddBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Balance.GetTransactionBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Balance.SetBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Balance.TakeBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Response.Balance.AddBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Balance.GetTransactionBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Balance.SetBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Balance.TakeBalanceResponseDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Balance.AddBalanceRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Balance.GetTransactionBalanceRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Balance.SetBalanceRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Balance.TakeBalanceRequestDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Balance.AddBalanceResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Balance.GetTransactionBalanceResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Balance.SetBalanceResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Balance.TakeBalanceResponseDTO;
 import org.example.fakeceit.Entity.TransactionBalance;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Enum.TransactionBalanceType;
@@ -28,13 +28,13 @@ import java.math.BigDecimal;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class BalanceService {
 
     private final UserRepository userRepository;
     private final TransactionBalanceRepository transactionBalanceRepository;
 
-    @Transactional
     public SetBalanceResponseDTO setBalance(@Valid SetBalanceRequestDTO setBalanceRequestDTO) {
         log.info("Попытка установки баланса игроку");
 
@@ -61,7 +61,6 @@ public class BalanceService {
         );
     }
 
-    @Transactional
     public AddBalanceResponseDTO addBalance(@Valid AddBalanceRequestDTO addBalanceRequestDTO) {
         log.info("Попытка добавления баланса игроку");
 
@@ -89,7 +88,6 @@ public class BalanceService {
         );
     }
 
-    @Transactional
     public TakeBalanceResponseDTO takeBalance(@Valid TakeBalanceRequestDTO takeBalanceRequestDTO) {
         log.info("Попытка убавления баланса игроку");
 
@@ -134,7 +132,6 @@ public class BalanceService {
         return userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
     }
 
-    @Transactional
     private void createTransactionBalance(BigDecimal deltaBalance, User user, TransactionBalanceType transactionBalanceType) {
         TransactionBalance transactionBalance = new TransactionBalance();
 

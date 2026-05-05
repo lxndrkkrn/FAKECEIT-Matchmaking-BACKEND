@@ -3,8 +3,8 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Team.*;
-import org.example.fakeceit.DTOs.Response.Team.*;
+import org.example.fakeceit.DTOs.Request.Domain.Team.*;
+import org.example.fakeceit.DTOs.Response.Domain.Team.*;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.Client.InvalidValue;
@@ -19,13 +19,13 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class TeamService {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
 
-    @Transactional
     public CreateTeamResponseDTO createTeam(@Valid CreateTeamRequestDTO createTeamRequestDTO) {
         log.info("Попытка создания команды");
 
@@ -49,7 +49,6 @@ public class TeamService {
         );
     }
 
-    @Transactional
     public DeleteTeamResponseDTO deleteTeam(@Valid DeleteTeamRequestDTO deleteTeamRequestDTO) {
         log.info("Попытка удаления команды");
 
@@ -62,7 +61,6 @@ public class TeamService {
         );
     }
 
-    @Transactional
     public AddUserToTeamResponseDTO addUserToTeam(@Valid AddUserToTeamRequestDTO addUserToTeamRequestDTO) {
         log.info("Попытка приглашения игрока с ID: {} в команду с ID: {}", addUserToTeamRequestDTO.userId(), addUserToTeamRequestDTO.teamId());
 
@@ -91,8 +89,7 @@ public class TeamService {
         );
     }
 
-    @Transactional
-    public RemoveUserFromTeamResponseDTO removeUserFromTeam(RemoveUserFromTeamRequestDTO removeUserFromTeamRequestDTO) {
+    public RemoveUserFromTeamResponseDTO removeUserFromTeam(@Valid RemoveUserFromTeamRequestDTO removeUserFromTeamRequestDTO) {
         log.info("Попытка удалить игрока с ID: {} из команды с ID: {}", removeUserFromTeamRequestDTO.userId(), removeUserFromTeamRequestDTO.teamId());
 
         Team team = teamRepository.findById(removeUserFromTeamRequestDTO.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
@@ -125,8 +122,7 @@ public class TeamService {
         );
     }
 
-    @Transactional
-    public SetUserAsCaptainResponseDTO setUserAsCaptain(SetUserAsCaptainRequestDTO setUserAsCaptainRequestDTO) {
+    public SetUserAsCaptainResponseDTO setUserAsCaptain(@Valid SetUserAsCaptainRequestDTO setUserAsCaptainRequestDTO) {
         log.info("Попытка установить пользователя с ID: {} капитаном команды с ID: {}", setUserAsCaptainRequestDTO.userId(), setUserAsCaptainRequestDTO.teamId());
 
         Team team = teamRepository.findById(setUserAsCaptainRequestDTO.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
@@ -151,8 +147,7 @@ public class TeamService {
         );
     }
 
-    @Transactional
-    public SetNameForTeamResponseDTO setNameForTeam(SetNameForTeamRequestDTO setNameForTeamRequestDTO) {
+    public SetNameForTeamResponseDTO setNameForTeam(@Valid SetNameForTeamRequestDTO setNameForTeamRequestDTO) {
         log.info("Попытка смены названия для команды с ID: {}", setNameForTeamRequestDTO.id());
 
         Team team = teamRepository.findById(setNameForTeamRequestDTO.id()).orElseThrow(() -> new NotFound404("Команда не найдена"));
@@ -167,8 +162,7 @@ public class TeamService {
         );
     }
 
-    @Transactional
-    public SetStateForTeamResponseDTO setStateForTeam(SetStateForTeamRequestDTO setStateForTeamRequestDTO) {
+    public SetStateForTeamResponseDTO setStateForTeam(@Valid SetStateForTeamRequestDTO setStateForTeamRequestDTO) {
         log.info("Попытка смены состояния для команды с ID: {}", setStateForTeamRequestDTO.id());
 
         Team team = teamRepository.findById(setStateForTeamRequestDTO.id()).orElseThrow(() -> new NotFound404("Команда не найдена"));
@@ -181,6 +175,10 @@ public class TeamService {
                 team.getId(),
                 team.getIsWinner()
         );
+    }
+
+    public Team findTeamById(Long id) {
+        return teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
     }
 
 }

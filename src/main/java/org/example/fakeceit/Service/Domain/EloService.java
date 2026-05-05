@@ -3,12 +3,12 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Elo.AddEloRequestDTO;
-import org.example.fakeceit.DTOs.Request.Elo.SetEloRequestDTO;
-import org.example.fakeceit.DTOs.Request.Elo.TakeEloRequestDTO;
-import org.example.fakeceit.DTOs.Response.Elo.AddEloResponseDTO;
-import org.example.fakeceit.DTOs.Response.Elo.SetEloResponseDTO;
-import org.example.fakeceit.DTOs.Response.Elo.TakeEloResponseDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Elo.AddEloRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Elo.SetEloRequestDTO;
+import org.example.fakeceit.DTOs.Request.Domain.Elo.TakeEloRequestDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Elo.AddEloResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Elo.SetEloResponseDTO;
+import org.example.fakeceit.DTOs.Response.Domain.Elo.TakeEloResponseDTO;
 import org.example.fakeceit.Entity.TransactionGame;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Enum.EloLevel;
@@ -24,13 +24,13 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 
 public class EloService {
 
     private final UserRepository userRepository;
     private final TransactionGameRepository transactionGameRepository;
 
-    @Transactional
     public SetEloResponseDTO setElo(@Valid SetEloRequestDTO setEloRequestDTO) {
         log.info("Попытка установить {} Elo пользователю с ID: {}", setEloRequestDTO.deltaElo(), setEloRequestDTO.id());
 
@@ -53,7 +53,6 @@ public class EloService {
         );
     }
 
-    @Transactional
     public AddEloResponseDTO addElo(@Valid AddEloRequestDTO addEloRequestDTO) {
         log.info("Попытка добавить {} Elo пользователю с ID: {}", addEloRequestDTO.deltaElo(), addEloRequestDTO.id());
 
@@ -78,7 +77,6 @@ public class EloService {
         );
     }
 
-    @Transactional
     public TakeEloResponseDTO takeElo(@Valid TakeEloRequestDTO takeEloRequestDTO) {
         log.info("Попытка снять {} Elo пользователю с ID: {}", takeEloRequestDTO.deltaElo(), takeEloRequestDTO.id());
 
