@@ -7,6 +7,7 @@ import org.example.fakeceit.DTOs.Request.Domain.User.*;
 import org.example.fakeceit.DTOs.Response.Domain.User.*;
 import org.example.fakeceit.Entity.Statistic;
 import org.example.fakeceit.Entity.User;
+import org.example.fakeceit.Enum.UserState;
 import org.example.fakeceit.Exception.Client.IncorrectName;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
 import org.example.fakeceit.Repositories.StatisticRepository;
@@ -28,147 +29,82 @@ public class UserService {
     private final UserRepository userRepository;
     private final StatisticRepository statisticRepository;
 
-    public CreateUserResponseDTO createUser(@Valid CreateUserRequestDTO createUserRequestDTO) {
+    public User createUser(@Valid String name, @Valid String password) {
         log.info("Попытка создания пользователя");
 
-        if (userRepository.existsByName(createUserRequestDTO.name())) {
+        if (userRepository.existsByName(name)) {
             throw new IncorrectName("Это имя уже занято");
         }
 
+        User user = new User();
         Statistic statistic = new Statistic();
 
-        User user = new User();
-
-        user.setName(createUserRequestDTO.name());
-        user.setPassword(createUserRequestDTO.password());
+        user.setName(name);
+        user.setPassword(password);
         user.setStatistic(statistic);
 
         userRepository.save(user);
         log.info("Пользователь создан, ID: {}", user.getId());
 
-        CreateUserResponseDTO createUserResponseDTO = new CreateUserResponseDTO(
-                user.getId(),
-                createUserRequestDTO.name(),
-                user.getBalance(),
-                user.getElo(),
-                user.getLevel(),
-                user.getSub()
-        );
-
-        return createUserResponseDTO;
+        return user;
     }
 
-    public DeleteUserResponseDTO deleteUser(@Valid DeleteUserRequestDTO deleteUserRequestDTO) {
-        log.info("Попытка удаления пользователя с ID: {}", deleteUserRequestDTO.id());
+    public void deleteUser(@Valid Long id) {
+        log.info("Попытка удаления пользователя с ID: {}", id);
 
-        User user = findUserById(deleteUserRequestDTO.id());
+        User user = findUserById(id);
         Statistic statistic = user.getStatistic();
-
-        DeleteUserResponseDTO deleteUserResponseDTO = new DeleteUserResponseDTO(
-                deleteUserRequestDTO.id(),
-                LocalDateTime.now()
-        );
 
         statisticRepository.delete(statistic);
         userRepository.delete(user);
 
-        log.info("Пользователь с ID: {} удалён", deleteUserRequestDTO.id());
-
-        return deleteUserResponseDTO;
+        log.info("Пользователь с ID: {} удалён", id);
     }
 
-    public ChangeNameResponseDTO changeName(@Valid ChangeNameRequestDTO changeNameRequestDTO) {
-        log.info("Попытка изменения имени пользователю с ID: {}", changeNameRequestDTO.id());
+    public void changeName(@Valid Long id, @Valid String name) {
+        log.info("Попытка изменения имени пользователю с ID: {}", id);
 
-        User user = findUserById(changeNameRequestDTO.id());
+        User user = findUserById(id);
 
-        user.setName(changeNameRequestDTO.name());
+        user.setName(name);
         userRepository.save(user);
 
-        ChangeNameResponseDTO changeNameResponseDTO = new ChangeNameResponseDTO(
-                changeNameRequestDTO.id(),
-                LocalDateTime.now()
-        );
-
-        log.info("Имя пользователю с ID: {} изменено", changeNameRequestDTO.id());
-
-        return changeNameResponseDTO;
+        log.info("Имя пользователю с ID: {} изменено", id);
     }
 
-    public ChangePasswordResponseDTO changePass(@Valid ChangePasswordRequestDTO changePasswordRequestDTO) {
-        log.info("Попытка изменения пароля пользователю с ID: {}", changePasswordRequestDTO.id());
+    public void changePass(@Valid Long id, @Valid String password) {
+        log.info("Попытка изменения пароля пользователю с ID: {}", id);
 
-        User user = findUserById(changePasswordRequestDTO.id());
+        User user = findUserById(id);
 
-        user.setPassword(changePasswordRequestDTO.password());
+        user.setPassword(password);
         userRepository.save(user);
 
-        ChangePasswordResponseDTO changePasswordResponseDTO = new ChangePasswordResponseDTO(
-                changePasswordRequestDTO.id(),
-                user.getName(),
-                LocalDateTime.now()
-        );
-
-        log.info("Пароль пользователю с ID: {} изменен", changePasswordRequestDTO.id());
-
-        return changePasswordResponseDTO;
+        log.info("Пароль пользователю с ID: {} изменен", id);
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDTO findUserById(FindUserByIdRequestDTO findUserByIdRequestDTO) {
-        User user = userRepository.findById(findUserByIdRequestDTO.id()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-
-        return new UserResponseDTO(
-                user.getId(),
-                user.getName(),
-                user.getBalance(),
-                user.getElo(),
-                user.getLevel(),
-                user.getSub()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public UserResponseDTO findUserByName(@Valid FindUserByNameRequestDTO findUserByNameRequestDTO) {
-        User user = userRepository.findUserByName(findUserByNameRequestDTO.name()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-
-        return new UserResponseDTO(
-                user.getId(),
-                user.getName(),
-                user.getBalance(),
-                user.getElo(),
-                user.getLevel(),
-                user.getSub()
-        );
-    }
-
-    public UserSetStateResponseDTO setUserState(UserSetStateRequestDTO setStateRequestDTO) {
-        log.info("Попытка установить статус пользователю");
-        User user = findUserById(setStateRequestDTO.id());
-
-        user.setUserState(setStateRequestDTO.userState());
-
-        return new UserSetStateResponseDTO(
-                user.getId(),
-                user.getUserState()
-        );
-    }
-
-
-    public SetUserSubResponseDTO setUserSub(SetUserSubRequestDTO setUserSubRequestDTO) {
-        log.info("Попытка установить подписку пользователю");
-        User user = findUserById(setUserSubRequestDTO.id());
-
-        user.setSub(setUserSubRequestDTO.sub());
-
-        return new SetUserSubResponseDTO(
-                user.getId(),
-                user.getSub()
-        );
-    }
-
     public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
     }
 
+    @Transactional(readOnly = true)
+    public User findUserByName(@Valid String name) {
+        return userRepository.findUserByName(name).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+    }
+
+    public void setUserState(Long id, UserState userState) {
+        log.info("Попытка установить статус пользователю");
+        User user = findUserById(id);
+
+        user.setUserState(userState);
+    }
+
+
+    public void setUserSub(Long id, Boolean sub) {
+        log.info("Попытка установить подписку пользователю");
+        User user = findUserById(id);
+
+        user.setSub(sub);
+    }
 }

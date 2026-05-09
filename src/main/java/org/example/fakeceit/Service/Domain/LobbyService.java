@@ -1,12 +1,7 @@
 package org.example.fakeceit.Service.Domain;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.fakeceit.Component.Interfaces.LobbyStatusHandler;
-import org.example.fakeceit.DTOs.Request.Domain.Lobby.CreateLobbyRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Lobby.DeleteLobbyRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Lobby.SetStatusLobbyRequestDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Lobby.CreateLobbyResponseDTO;
 import org.example.fakeceit.Entity.IP;
 import org.example.fakeceit.Entity.Lobby;
 import org.example.fakeceit.Entity.GameMap;
@@ -55,15 +50,15 @@ public class LobbyService {
     }
 
 
-    public CreateLobbyResponseDTO createLobby(@Valid CreateLobbyRequestDTO createLobbyRequestDTO) {
+    public Lobby createLobby(Long IP_id, Long mapId, Long teamA_id, Long teamB_id) {
         log.info("Попытка создания лобби");
 
         Lobby lobby = new Lobby();
 
-        IP ip = ipRepository.findById(createLobbyRequestDTO.IP_id()).orElseThrow(() -> new NotFound404("IP адреса с таким ID не существует"));
-        GameMap gameMap = mapRepository.findById(createLobbyRequestDTO.mapId()).orElseThrow(() -> new NotFound404("Такой карты не существует"));
-        Team teamA = teamRepository.findById(createLobbyRequestDTO.teamA_id()).orElseThrow(() -> new NotFound404("Такой команды не существует"));
-        Team teamB = teamRepository.findById(createLobbyRequestDTO.teamB_id()).orElseThrow(() -> new NotFound404("Такой команды не существует"));
+        IP ip = ipRepository.findById(IP_id).orElseThrow(() -> new NotFound404("IP адреса с таким ID не существует"));
+        GameMap gameMap = mapRepository.findById(mapId).orElseThrow(() -> new NotFound404("Такой карты не существует"));
+        Team teamA = teamRepository.findById(teamA_id).orElseThrow(() -> new NotFound404("Такой команды не существует"));
+        Team teamB = teamRepository.findById(teamB_id).orElseThrow(() -> new NotFound404("Такой команды не существует"));
 
         lobby.setIp(ip);
         lobby.setGameMap(gameMap);
@@ -72,32 +67,25 @@ public class LobbyService {
 
         lobbyRepository.save(lobby);
 
-        return new CreateLobbyResponseDTO(
-                lobby.getId(),
-                lobby.getIp().getId(),
-                lobby.getGameMap().getId(),
-                lobby.getTeamA().getId(),
-                lobby.getTeamB().getId()
-        );
+        return lobby;
     }
 
-    public void deleteLobby(@Valid DeleteLobbyRequestDTO deleteLobbyRequestDTO) {
+    public void deleteLobby(Long id) {
         log.info("Попытка удаления лобби");
 
-        Lobby lobby = lobbyRepository.findById(deleteLobbyRequestDTO.id()).orElseThrow(() -> new NotFound404("Лобби не найдено"));
+        Lobby lobby = lobbyRepository.findById(id).orElseThrow(() -> new NotFound404("Лобби не найдено"));
 
         lobbyRepository.delete(lobby);
     }
 
-    public void setStatusLobby(@Valid SetStatusLobbyRequestDTO setStatusLobbyRequestDTO) {
+    public void setStatusLobby(Long id, LobbyStatus lobbyStatus) {
         log.info("Попытка смены статуса для лобби");
 
-        Lobby lobby = lobbyRepository.findById(setStatusLobbyRequestDTO.id()).orElseThrow(() -> new NotFound404("Лобби не найдено"));
-        LobbyStatus status = setStatusLobbyRequestDTO.lobbyStatus();
+        Lobby lobby = lobbyRepository.findById(id).orElseThrow(() -> new NotFound404("Лобби не найдено"));
 
-        lobby.setStatus(status);
+        lobby.setStatus(lobbyStatus);
 
-        LobbyStatusHandler handler = statusHandler.get(status);
+        LobbyStatusHandler handler = statusHandler.get(lobbyStatus);
 
         if (handler != null) {
             handler.handle(lobby);

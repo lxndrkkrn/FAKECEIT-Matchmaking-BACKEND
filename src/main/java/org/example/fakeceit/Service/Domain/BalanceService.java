@@ -1,16 +1,7 @@
 package org.example.fakeceit.Service.Domain;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.Balance.AddBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Balance.GetTransactionBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Balance.SetBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Balance.TakeBalanceRequestDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Balance.AddBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Balance.GetTransactionBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Balance.SetBalanceResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Balance.TakeBalanceResponseDTO;
 import org.example.fakeceit.Entity.TransactionBalance;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Enum.TransactionBalanceType;
@@ -35,97 +26,69 @@ public class BalanceService {
     private final UserRepository userRepository;
     private final TransactionBalanceRepository transactionBalanceRepository;
 
-    public SetBalanceResponseDTO setBalance(@Valid SetBalanceRequestDTO setBalanceRequestDTO) {
+    public void setBalance(Long id, BigDecimal deltaBalance, TransactionBalanceType transactionBalanceType) {
         log.info("Попытка установки баланса игроку");
 
-        if (setBalanceRequestDTO.deltaBalance().compareTo(BigDecimal.ZERO) < 0) {
+        if (deltaBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeBalance("Нельзя установить отрицательный баланс");
         }
 
-        User user = findById(setBalanceRequestDTO.id());
+        User user = findById(id);
 
-        user.setBalance(setBalanceRequestDTO.deltaBalance());
+        user.setBalance(deltaBalance);
 
         createTransactionBalance(
-                setBalanceRequestDTO.deltaBalance(),
+                deltaBalance,
                 user,
-                setBalanceRequestDTO.transactionBalanceType()
+                transactionBalanceType
         );
 
         userRepository.save(user);
-
-        return new SetBalanceResponseDTO(
-                user.getId(),
-                user.getBalance(),
-                setBalanceRequestDTO.transactionBalanceType()
-        );
     }
 
-    public AddBalanceResponseDTO addBalance(@Valid AddBalanceRequestDTO addBalanceRequestDTO) {
+    public void addBalance(Long id, BigDecimal deltaBalance, TransactionBalanceType transactionBalanceType) {
         log.info("Попытка добавления баланса игроку");
 
-        if (addBalanceRequestDTO.deltaBalance().compareTo(BigDecimal.ZERO) < 0) {
+        if (deltaBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeBalance("Нельзя добавить отрицательный баланс");
         }
 
-        User user = findById(addBalanceRequestDTO.id());
+        User user = findById(id);
 
-        user.setBalance(user.getBalance().add(addBalanceRequestDTO.deltaBalance()));
+        user.setBalance(user.getBalance().add(deltaBalance));
 
         createTransactionBalance(
-                addBalanceRequestDTO.deltaBalance(),
+                deltaBalance,
                 user,
-                addBalanceRequestDTO.transactionBalanceType()
+                transactionBalanceType
         );
 
         userRepository.save(user);
-
-        return new AddBalanceResponseDTO(
-                user.getId(),
-                addBalanceRequestDTO.deltaBalance(),
-                user.getBalance(),
-                addBalanceRequestDTO.transactionBalanceType()
-        );
     }
 
-    public TakeBalanceResponseDTO takeBalance(@Valid TakeBalanceRequestDTO takeBalanceRequestDTO) {
+    public void takeBalance(Long id, BigDecimal deltaBalance, TransactionBalanceType transactionBalanceType) {
         log.info("Попытка убавления баланса игроку");
 
-        User user = findById(takeBalanceRequestDTO.id());
+        User user = findById(id);
 
-        if (takeBalanceRequestDTO.deltaBalance().compareTo(user.getBalance()) > 0) {
+        if (deltaBalance.compareTo(user.getBalance()) > 0) {
             throw new NegativeBalance("Не дастаточно средств");
         }
 
-        user.setBalance(user.getBalance().subtract(takeBalanceRequestDTO.deltaBalance()));
+        user.setBalance(user.getBalance().subtract(deltaBalance));
 
         createTransactionBalance(
-                takeBalanceRequestDTO.deltaBalance().negate(),
+                deltaBalance.negate(),
                 user,
-                takeBalanceRequestDTO.transactionBalanceType()
+                transactionBalanceType
         );
 
         userRepository.save(user);
-
-        return new TakeBalanceResponseDTO(
-                user.getId(),
-                takeBalanceRequestDTO.deltaBalance(),
-                user.getBalance(),
-                takeBalanceRequestDTO.transactionBalanceType()
-        );
     }
 
     @Transactional(readOnly = true)
-    public GetTransactionBalanceResponseDTO getTransactionBalance(@Valid GetTransactionBalanceRequestDTO getTransactionBalanceRequestDTO) {
-        TransactionBalance transactionBalance = transactionBalanceRepository.findById(getTransactionBalanceRequestDTO.id()).orElseThrow(() -> new NotFound404("Транзакция баланса не найдена"));
-
-        return new GetTransactionBalanceResponseDTO(
-                transactionBalance.getId(),
-                transactionBalance.getDeltaBalance(),
-                transactionBalance.getTransactionBalanceType(),
-                transactionBalance.getUser().getId(),
-                transactionBalance.getLocalDateTime()
-        );
+    public TransactionBalance getTransactionBalance(Long id) {
+        return transactionBalanceRepository.findById(id).orElseThrow(() -> new NotFound404("Транзакция баланса не найдена"));
     }
 
     private User findById(Long id) {

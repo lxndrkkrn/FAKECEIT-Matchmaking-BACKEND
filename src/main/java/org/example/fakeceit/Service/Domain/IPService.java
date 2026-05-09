@@ -2,10 +2,9 @@ package org.example.fakeceit.Service.Domain;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.IP.CreateIP_Request_DTO;
-import org.example.fakeceit.DTOs.Request.Domain.IP.DeleteIP_Request_DTO;
-import org.example.fakeceit.DTOs.Response.Domain.IP.CreateIP_Response_DTO;
 import org.example.fakeceit.Entity.IP;
+import org.example.fakeceit.Enum.ServerRegion;
+import org.example.fakeceit.Enum.ServerStatus;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
 import org.example.fakeceit.Repositories.IPRepository;
 import org.springframework.stereotype.Service;
@@ -22,30 +21,24 @@ public class IPService {
 
     private final IPRepository ipRepository;
 
-    public CreateIP_Response_DTO createIP(CreateIP_Request_DTO createIP_request_dto) {
+    public IP createIP(String ip, Integer port, ServerStatus status, ServerRegion region, String rcon) {
         log.info("Попытка создания сервера");
 
-        IP ip = new IP();
+        IP ipAddress = new IP();
 
-        ip.setIp(createIP_request_dto.ip());
-        ip.setPort(createIP_request_dto.port());
-        ip.setStatus(createIP_request_dto.status());
-        ip.setRegion(createIP_request_dto.region());
-        ip.setRcon(createIP_request_dto.rcon());
+        ipAddress.setIp(ip);
+        ipAddress.setPort(port);
+        ipAddress.setStatus(status);
+        ipAddress.setRegion(region);
+        ipAddress.setRcon(rcon);
 
-        return new CreateIP_Response_DTO(
-                ip.getId(),
-                ip.getIp(),
-                ip.getPort(),
-                ip.getStatus(),
-                ip.getRegion()
-        );
+        return ipAddress;
     }
 
-    public void deleteIP(DeleteIP_Request_DTO deleteIPRequestDto) {
+    public void deleteIP(Long id) {
         log.info("Попытка удаления сервера");
 
-        IP ip = ipRepository.findById(deleteIPRequestDto.id()).orElseThrow(() -> new NotFound404("Сервер не найден"));
+        IP ip = ipRepository.findById(id).orElseThrow(() -> new NotFound404("Сервер не найден"));
 
         ipRepository.delete(ip);
     }

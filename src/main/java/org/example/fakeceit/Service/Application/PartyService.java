@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.fakeceit.DTOs.Request.Domain.Invite.AcceptInviteRequestDTO;
 import org.example.fakeceit.DTOs.Request.Domain.Invite.CreateInviteRequestDTO;
 import org.example.fakeceit.DTOs.Request.Domain.Invite.DeleteInviteRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Team.AddUserToTeamRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Team.RemoveUserFromTeamRequestDTO;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.ClientHTTP.Forbidden403;
@@ -17,8 +15,6 @@ import org.example.fakeceit.Service.Domain.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 @Service
 @Slf4j

@@ -1,15 +1,7 @@
 package org.example.fakeceit.Service.Domain;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.Map.CreateMapRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Map.DeleteMapRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Map.GetMapByIdRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Map.GetMapByNameRequestDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Map.CreateMapResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Map.DeleteMapResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Map.GetMapResponseDTO;
 import org.example.fakeceit.Entity.GameMap;
 import org.example.fakeceit.Exception.Client.IncorrectName;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
@@ -28,71 +20,45 @@ public class MapService {
 
     private final MapRepository mapRepository;
 
-    public CreateMapResponseDTO createMap(@Valid CreateMapRequestDTO createMapRequestDTO) {
+    public GameMap createMap(String name, String iconImg, String backgroundImg, String bannerImg) {
         log.info("Попытка создания карты");
 
-        if (mapRepository.existByName(createMapRequestDTO.name())) {
+        if (mapRepository.existByName(name)) {
             throw new IncorrectName("Это имя уже занято");
         }
 
         GameMap gameMap = new GameMap();
 
-        gameMap.setName(createMapRequestDTO.name());
-        gameMap.setIconImg(createMapRequestDTO.iconImg());
-        gameMap.setBackgroundImg(createMapRequestDTO.backgroundImg());
-        gameMap.setBannerImg(createMapRequestDTO.bannerImg());
+        gameMap.setName(name);
+        gameMap.setIconImg(iconImg);
+        gameMap.setBackgroundImg(backgroundImg);
+        gameMap.setBannerImg(bannerImg);
 
         mapRepository.save(gameMap);
 
-        return new CreateMapResponseDTO(
-                gameMap.getId(),
-                gameMap.getName(),
-                gameMap.getIconImg(),
-                gameMap.getBackgroundImg(),
-                gameMap.getBannerImg()
-        );
+        return gameMap;
     }
 
-    public DeleteMapResponseDTO deleteMap(@Valid DeleteMapRequestDTO deleteMapRequestDTO) {
+    public void deleteMap(Long id) {
         log.info("Попытка удаления карты");
 
-        GameMap gameMap = mapRepository.findById(deleteMapRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
+        GameMap gameMap = mapRepository.findById(id).orElseThrow(() -> new NotFound404("Карта не найдена"));
 
         mapRepository.delete(gameMap);
-
-        return new DeleteMapResponseDTO(
-                gameMap.getId()
-        );
     }
 
     @Transactional(readOnly = true)
-    public GetMapResponseDTO getMapById(@Valid GetMapByIdRequestDTO getMapByIdRequestDTO) {
+    public GameMap getMapById(Long id) {
         log.info("Попытка получения информации о карте по ID");
 
-        GameMap gameMap = mapRepository.findById(getMapByIdRequestDTO.id()).orElseThrow(() -> new NotFound404("Карта не найдена"));
-
-        return new GetMapResponseDTO(
-                gameMap.getId(),
-                gameMap.getName(),
-                gameMap.getIconImg(),
-                gameMap.getBackgroundImg(),
-                gameMap.getBannerImg()
-        );
+        return mapRepository.findById(id).orElseThrow(() -> new NotFound404("Карта не найдена"));
     }
 
     @Transactional(readOnly = true)
-    public GetMapResponseDTO getMapByName(@Valid GetMapByNameRequestDTO getMapByNameRequestDTO) {
+    public GameMap getMapByName(String name) {
         log.info("Попытка получения информации о карте по названию");
 
-        GameMap gameMap = mapRepository.findByName(getMapByNameRequestDTO.name()).orElseThrow(() -> new NotFound404("Карта не найдена"));
-
-        return new GetMapResponseDTO(
-                gameMap.getId(),
-                gameMap.getName(),
-                gameMap.getIconImg(),
-                gameMap.getBackgroundImg(),
-                gameMap.getBannerImg()
-        );
+        return mapRepository.findByName(name).orElseThrow(() -> new NotFound404("Карта не найдена"));
     }
 
 }

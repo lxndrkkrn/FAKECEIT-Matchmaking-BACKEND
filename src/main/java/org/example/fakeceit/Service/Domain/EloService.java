@@ -1,14 +1,7 @@
 package org.example.fakeceit.Service.Domain;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.Elo.AddEloRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Elo.SetEloRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Elo.TakeEloRequestDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Elo.AddEloResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Elo.SetEloResponseDTO;
-import org.example.fakeceit.DTOs.Response.Domain.Elo.TakeEloResponseDTO;
 import org.example.fakeceit.Entity.TransactionGame;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Enum.EloLevel;
@@ -31,36 +24,28 @@ public class EloService {
     private final UserRepository userRepository;
     private final TransactionGameRepository transactionGameRepository;
 
-    public SetEloResponseDTO setElo(@Valid SetEloRequestDTO setEloRequestDTO) {
-        log.info("Попытка установить {} Elo пользователю с ID: {}", setEloRequestDTO.deltaElo(), setEloRequestDTO.id());
+    public void setElo(Long id, Integer deltaElo) {
+        log.info("Попытка установить {} Elo пользователю с ID: {}", deltaElo, id);
 
         TransactionGame transactionGame = new TransactionGame();
-        User user = userRepository.findById(setEloRequestDTO.id()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        int deltaElo = setEloRequestDTO.deltaElo();
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
-        transactionGame.setAmountElo(setEloRequestDTO.deltaElo());
+        transactionGame.setAmountElo(deltaElo);
         transactionGame.setUser(user);
 
         updatePlayerElo(user, deltaElo);
 
         transactionGameRepository.save(transactionGame);
         userRepository.save(user);
-
-        return new SetEloResponseDTO(
-                transactionGame.getId(),
-                user.getId(),
-                setEloRequestDTO.deltaElo()
-        );
     }
 
-    public AddEloResponseDTO addElo(@Valid AddEloRequestDTO addEloRequestDTO) {
-        log.info("Попытка добавить {} Elo пользователю с ID: {}", addEloRequestDTO.deltaElo(), addEloRequestDTO.id());
+    public void addElo(Long id, Integer deltaElo) {
+        log.info("Попытка добавить {} Elo пользователю с ID: {}", deltaElo, id);
 
         TransactionGame transactionGame = new TransactionGame();
-        User user = userRepository.findById(addEloRequestDTO.id()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        int deltaElo = addEloRequestDTO.deltaElo();
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
-        transactionGame.setAmountElo(addEloRequestDTO.deltaElo());
+        transactionGame.setAmountElo(deltaElo);
         transactionGame.setUser(user);
 
         int totalElo = user.getElo() + deltaElo;
@@ -69,22 +54,15 @@ public class EloService {
 
         transactionGameRepository.save(transactionGame);
         userRepository.save(user);
-
-        return new AddEloResponseDTO(
-                transactionGame.getId(),
-                user.getId(),
-                addEloRequestDTO.deltaElo()
-        );
     }
 
-    public TakeEloResponseDTO takeElo(@Valid TakeEloRequestDTO takeEloRequestDTO) {
-        log.info("Попытка снять {} Elo пользователю с ID: {}", takeEloRequestDTO.deltaElo(), takeEloRequestDTO.id());
+    public void takeElo(Long id, Integer deltaElo) {
+        log.info("Попытка снять {} Elo пользователю с ID: {}", deltaElo, id);
 
         TransactionGame transactionGame = new TransactionGame();
-        User user = userRepository.findById(takeEloRequestDTO.id()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        int deltaElo = takeEloRequestDTO.deltaElo();
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
-        transactionGame.setAmountElo(takeEloRequestDTO.deltaElo() * -1);
+        transactionGame.setAmountElo(deltaElo * -1);
         transactionGame.setUser(user);
 
         int totalElo = user.getElo() - deltaElo;
@@ -93,12 +71,6 @@ public class EloService {
 
         transactionGameRepository.save(transactionGame);
         userRepository.save(user);
-
-        return new TakeEloResponseDTO(
-                transactionGame.getId(),
-                user.getId(),
-                takeEloRequestDTO.deltaElo()
-        );
     }
 
     private void updatePlayerElo(User user, int newElo) {

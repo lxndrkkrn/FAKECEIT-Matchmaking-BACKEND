@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -26,46 +28,37 @@ public class TeamService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
 
-    public CreateTeamResponseDTO createTeam(@Valid CreateTeamRequestDTO createTeamRequestDTO) {
+    public Team createTeam(Long captainId, List<Long> players, String name) {
         log.info("Попытка создания команды");
 
-        if (createTeamRequestDTO.players().size() > 5) {
+        if (players.size() > 5) {
             throw new InvalidValue("Некоректный размер команды (должен быть от 1 до 5 включительно)");
         }
 
         Team team = new Team();
 
-        team.setCaptain(userRepository.findById(createTeamRequestDTO.captainId()).orElseThrow(() -> new NotFound404("Пользователь не найден")));
-        team.setPlayers(userRepository.findAllById(createTeamRequestDTO.players()));
-        team.setName(createTeamRequestDTO.name());
+        team.setCaptain(userRepository.findById(captainId).orElseThrow(() -> new NotFound404("Пользователь не найден")));
+        team.setPlayers(userRepository.findAllById(players));
+        team.setName(name);
 
         teamRepository.save(team);
 
-        return new CreateTeamResponseDTO(
-                team.getId(),
-                createTeamRequestDTO.players(),
-                team.getName(),
-                team.getCaptain().getId()
-        );
+        return team;
     }
 
-    public DeleteTeamResponseDTO deleteTeam(@Valid DeleteTeamRequestDTO deleteTeamRequestDTO) {
+    public void deleteTeam(Long id) {
         log.info("Попытка удаления команды");
 
-        Team team = teamRepository.findById(deleteTeamRequestDTO.id()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        Team team = teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
         teamRepository.delete(team);
-
-        return new DeleteTeamResponseDTO(
-                team.getId()
-        );
     }
 
-    public AddUserToTeamResponseDTO addUserToTeam(@Valid AddUserToTeamRequestDTO addUserToTeamRequestDTO) {
-        log.info("Попытка приглашения игрока с ID: {} в команду с ID: {}", addUserToTeamRequestDTO.userId(), addUserToTeamRequestDTO.teamId());
+    public Team addUserToTeam(Long userId, Long teamId) {
+        log.info("Попытка приглашения игрока с ID: {} в команду с ID: {}", userId, teamId);
 
-        User user = userRepository.findById(addUserToTeamRequestDTO.userId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        Team team = teamRepository.findById(addUserToTeamRequestDTO.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
         if (team.getPlayers().size() >= 5) {
             throw new InvalidValue("В команде уже максимум игроков (5)");
@@ -83,33 +76,23 @@ public class TeamService {
 
         teamRepository.save(team);
 
-        return new AddUserToTeamResponseDTO(
-                team.getId(),
-                user.getId()
-        );
+        return team;
     }
 
-    public RemoveUserFromTeamResponseDTO removeUserFromTeam(@Valid RemoveUserFromTeamRequestDTO removeUserFromTeamRequestDTO) {
-        log.info("Попытка удалить игрока с ID: {} из команды с ID: {}", removeUserFromTeamRequestDTO.userId(), removeUserFromTeamRequestDTO.teamId());
+    public Team removeUserFromTeam(Long userId, Long teamId) {
+        log.info("Попытка удалить игрока с ID: {} из команды с ID: {}", userId, teamId);
 
-        Team team = teamRepository.findById(removeUserFromTeamRequestDTO.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
         if (team.getPlayers().isEmpty()) {
             throw new InvalidValue("Команда пуста");
         }
 
-        User user = userRepository.findById(removeUserFromTeamRequestDTO.userId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
         if (team.getCaptain().equals(user)) {
             log.info("Удалён капитан. Команда распущена (удалена).");
-
-            deleteTeam(new DeleteTeamRequestDTO(
-                    removeUserFromTeamRequestDTO.teamId()
-            ));
-
-            return new RemoveUserFromTeamResponseDTO(
-                    removeUserFromTeamRequestDTO.teamId()
-            );
+            return team;
         }
 
         team.getPlayers().remove(user);
@@ -117,21 +100,19 @@ public class TeamService {
 
         teamRepository.save(team);
 
-        return new RemoveUserFromTeamResponseDTO(
-                removeUserFromTeamRequestDTO.teamId()
-        );
+        return team;
     }
 
-    public SetUserAsCaptainResponseDTO setUserAsCaptain(@Valid SetUserAsCaptainRequestDTO setUserAsCaptainRequestDTO) {
-        log.info("Попытка установить пользователя с ID: {} капитаном команды с ID: {}", setUserAsCaptainRequestDTO.userId(), setUserAsCaptainRequestDTO.teamId());
+    public Team setUserAsCaptain(Long userId, Long teamId) {
+        log.info("Попытка установить пользователя с ID: {} капитаном команды с ID: {}", userId, teamId);
 
-        Team team = teamRepository.findById(setUserAsCaptainRequestDTO.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
         if (team.getPlayers().isEmpty()) {
             throw new InvalidValue("Команда пуста");
         }
 
-        User user = userRepository.findById(setUserAsCaptainRequestDTO.userId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
         if (!team.getPlayers().contains(user)) {
             throw new NotFound404("Пользователь в этой команде не найден. Возможно, он существует в другом месте.");
@@ -141,40 +122,27 @@ public class TeamService {
 
         teamRepository.save(team);
 
-        return new SetUserAsCaptainResponseDTO(
-                team.getCaptain().getId(),
-                team.getId()
-        );
+        return team;
     }
 
-    public SetNameForTeamResponseDTO setNameForTeam(@Valid SetNameForTeamRequestDTO setNameForTeamRequestDTO) {
-        log.info("Попытка смены названия для команды с ID: {}", setNameForTeamRequestDTO.id());
+    public void setNameForTeam(Long id, String name) {
+        log.info("Попытка смены названия для команды с ID: {}", id);
 
-        Team team = teamRepository.findById(setNameForTeamRequestDTO.id()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        Team team = teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
-        team.setName(setNameForTeamRequestDTO.name());
+        team.setName(name);
 
         teamRepository.save(team);
-
-        return new SetNameForTeamResponseDTO(
-                team.getId(),
-                team.getName()
-        );
     }
 
-    public SetStateForTeamResponseDTO setStateForTeam(@Valid SetStateForTeamRequestDTO setStateForTeamRequestDTO) {
-        log.info("Попытка смены состояния для команды с ID: {}", setStateForTeamRequestDTO.id());
+    public void setStateForTeam(Long id, Boolean state) {
+        log.info("Попытка смены состояния для команды с ID: {}", id);
 
-        Team team = teamRepository.findById(setStateForTeamRequestDTO.id()).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        Team team = teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
 
-        team.setIsWinner(setStateForTeamRequestDTO.state());
+        team.setIsWinner(state);
 
         teamRepository.save(team);
-
-        return new SetStateForTeamResponseDTO(
-                team.getId(),
-                team.getIsWinner()
-        );
     }
 
     public Team findTeamById(Long id) {

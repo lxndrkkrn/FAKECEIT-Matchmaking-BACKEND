@@ -1,6 +1,7 @@
 package org.example.fakeceit.Service.Domain;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.fakeceit.DTOs.Request.Domain.Invite.CreateInviteRequestDTO;
@@ -32,14 +33,14 @@ public class InviteService {
     private final IPRepository ipRepository;
     private final UserRepository userRepository;
 
-    public void createInvite(@Valid CreateInviteRequestDTO dto) {
+    public void createInvite(Long inviterId, Long invitedId, Long teamId) {
         log.info("Попытка создания приглашения");
 
         Invite invite = new Invite();
 
-        Team team = teamRepository.findById(dto.teamId()).orElseThrow(() -> new NotFound404("Команда не найдена"));
-        User inviter = userRepository.findById(dto.inviterId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        User invited = userRepository.findById(dto.invitedId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        User inviter = userRepository.findById(inviterId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        User invited = userRepository.findById(invitedId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
         if (inviter.getTeamList().contains(team)) {
             throw new BadRequest400("Инициатор приглашения не состоит в команде");
@@ -58,12 +59,12 @@ public class InviteService {
         inviteRepository.save(invite);
     }
 
-    public void deleteInvite(@Valid DeleteInviteRequestDTO dto) {
+    public void deleteInvite(Long inviteId, Long deinviterId, Long invitedId) {
         log.info("Попытка удаления приглашения");
 
-        Invite invite = inviteRepository.findById(dto.inviteId()).orElseThrow(() -> new NotFound404("Приглашение не найдено"));
-        User deinviter = userRepository.findById(dto.deinviterId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
-        User invited = userRepository.findById(dto.invitedId()).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        Invite invite = inviteRepository.findById(inviteId).orElseThrow(() -> new NotFound404("Приглашение не найдено"));
+        User deinviter = userRepository.findById(deinviterId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
+        User invited = userRepository.findById(invitedId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
         if (!invite.getInviter().equals(deinviter) && !invite.getInvited().equals(invited)) {
             throw new Forbidden403("Вы не можете удалять чужое приглашение");
