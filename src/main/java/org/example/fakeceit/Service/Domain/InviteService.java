@@ -1,18 +1,14 @@
 package org.example.fakeceit.Service.Domain;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.Invite.CreateInviteRequestDTO;
-import org.example.fakeceit.DTOs.Request.Domain.Invite.DeleteInviteRequestDTO;
 import org.example.fakeceit.Entity.Invite;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.ClientHTTP.BadRequest400;
 import org.example.fakeceit.Exception.ClientHTTP.Forbidden403;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
-import org.example.fakeceit.Exception.ServerHTTP.ServiceUnavailable503;
 import org.example.fakeceit.Repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +29,7 @@ public class InviteService {
     private final IPRepository ipRepository;
     private final UserRepository userRepository;
 
-    public void createInvite(Long inviterId, Long invitedId, Long teamId) {
+    public Invite createInvite(Long inviterId, Long invitedId, Long teamId) {
         log.info("Попытка создания приглашения");
 
         Invite invite = new Invite();
@@ -42,7 +38,7 @@ public class InviteService {
         User inviter = userRepository.findById(inviterId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
         User invited = userRepository.findById(invitedId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
-        if (inviter.getTeamList().contains(team)) {
+        if (!inviter.getTeamList().contains(team)) {
             throw new BadRequest400("Инициатор приглашения не состоит в команде");
         }
         if (!invited.getTeamList().isEmpty()) {
@@ -57,6 +53,8 @@ public class InviteService {
         invite.setInvited(invited);
 
         inviteRepository.save(invite);
+
+        return invite;
     }
 
     public void deleteInvite(Long inviteId, Long deinviterId, Long invitedId) {
@@ -71,6 +69,28 @@ public class InviteService {
         }
 
         inviteRepository.delete(invite);
+    }
+
+    public void setStateFromInvite(Long inviteId, Boolean state) {
+        log.info("Попытка изменения статуса для инвайта {}", inviteId);
+
+        Invite invite = inviteRepository.findById(inviteId).orElseThrow(() -> new NotFound404("Приглашение не найдено"));
+
+        invite.setState(state);
+    }
+
+    public Invite findInviteById(Long id) {
+        Invite invite = inviteRepository.findById(id).orElseThrow(() -> new NotFound404("Инвайт не найден"));
+
+        if (!invite.getState()) {
+            throw new Forbidden403("Инвайт не действителен");
+        }
+
+        return invite;
+    }
+
+    public Invite findAnyInviteById(Long id) {
+        return inviteRepository.findById(id).orElseThrow(() -> new NotFound404("Инвайт не найден"));
     }
 
 }

@@ -52,6 +52,12 @@ public class User {
     private Boolean sub = false;
 
     @NotNull
+    private Boolean isSearchGame = false;
+
+    @NotNull
+    private Boolean isInGame = false;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private UserState userState = UserState.ACTIVE;
 

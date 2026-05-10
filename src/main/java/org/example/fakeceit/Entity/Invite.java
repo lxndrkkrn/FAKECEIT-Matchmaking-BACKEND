@@ -32,6 +32,9 @@ public class Invite {
     private User invited;
 
     @NotNull
+    private Boolean state = true;
+
+    @NotNull
     private LocalDateTime inviteDate = LocalDateTime.now();
 
     @NotNull

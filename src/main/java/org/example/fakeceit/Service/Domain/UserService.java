@@ -3,8 +3,6 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.User.*;
-import org.example.fakeceit.DTOs.Response.Domain.User.*;
 import org.example.fakeceit.Entity.Statistic;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Enum.UserState;
@@ -29,7 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final StatisticRepository statisticRepository;
 
-    public User createUser(@Valid String name, @Valid String password) {
+    public User createUser(String name, String password) {
         log.info("Попытка создания пользователя");
 
         if (userRepository.existsByName(name)) {
@@ -49,7 +47,7 @@ public class UserService {
         return user;
     }
 
-    public void deleteUser(@Valid Long id) {
+    public void deleteUser(Long id) {
         log.info("Попытка удаления пользователя с ID: {}", id);
 
         User user = findUserById(id);
@@ -61,7 +59,7 @@ public class UserService {
         log.info("Пользователь с ID: {} удалён", id);
     }
 
-    public void changeName(@Valid Long id, @Valid String name) {
+    public void changeName(Long id, String name) {
         log.info("Попытка изменения имени пользователю с ID: {}", id);
 
         User user = findUserById(id);
@@ -72,7 +70,7 @@ public class UserService {
         log.info("Имя пользователю с ID: {} изменено", id);
     }
 
-    public void changePass(@Valid Long id, @Valid String password) {
+    public void changePass(Long id, String password) {
         log.info("Попытка изменения пароля пользователю с ID: {}", id);
 
         User user = findUserById(id);
@@ -89,7 +87,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findUserByName(@Valid String name) {
+    public User findUserByName(String name) {
         return userRepository.findUserByName(name).orElseThrow(() -> new NotFound404("Пользователь не найден"));
     }
 

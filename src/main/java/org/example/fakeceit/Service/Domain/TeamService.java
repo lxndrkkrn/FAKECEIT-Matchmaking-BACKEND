@@ -3,8 +3,6 @@ package org.example.fakeceit.Service.Domain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.fakeceit.DTOs.Request.Domain.Team.*;
-import org.example.fakeceit.DTOs.Response.Domain.Team.*;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.Client.InvalidValue;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -83,20 +82,13 @@ public class TeamService {
         log.info("Попытка удалить игрока с ID: {} из команды с ID: {}", userId, teamId);
 
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
-
-        if (team.getPlayers().isEmpty()) {
-            throw new InvalidValue("Команда пуста");
-        }
-
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFound404("Пользователь не найден"));
 
-        if (team.getCaptain().equals(user)) {
-            log.info("Удалён капитан. Команда распущена (удалена).");
-            return team;
+        if (!team.getPlayers().remove(user)) {
+            throw new InvalidValue("Этот игрок не состоит в данной команде");
         }
 
         team.getPlayers().remove(user);
-        user.getTeamList().remove(team);
 
         teamRepository.save(team);
 
@@ -147,6 +139,13 @@ public class TeamService {
 
     public Team findTeamById(Long id) {
         return teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
+    }
+
+    public Optional<Team> findOptionalTeamById(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        return teamRepository.findById(id);
     }
 
 }
