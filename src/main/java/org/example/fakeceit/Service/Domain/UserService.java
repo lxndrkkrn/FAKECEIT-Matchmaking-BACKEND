@@ -98,11 +98,24 @@ public class UserService {
         user.setUserState(userState);
     }
 
-
     public void setUserSub(Long id, Boolean sub) {
         log.info("Попытка установить подписку пользователю");
         User user = findUserById(id);
 
         user.setSub(sub);
+    }
+
+    public void setUserSearchState(Long id, Boolean state) {
+        log.info("Попытка установить состояние поиска игры пользователю");
+        User user = findUserById(id);
+
+        user.setIsSearchGame(state);
+    }
+
+    public void setUserGameState(Long id, Boolean state) {
+        log.info("Попытка установить состояние нахождения в игре пользователю");
+        User user = findUserById(id);
+
+        user.setIsInGame(state);
     }
 }

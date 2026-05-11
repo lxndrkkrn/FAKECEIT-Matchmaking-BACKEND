@@ -6,6 +6,8 @@ import lombok.Data;
 import org.example.fakeceit.Enum.LobbyStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "lobbies")
@@ -52,5 +54,25 @@ public class Lobby {
 
     private LocalDateTime waitingAt;
     private LocalDateTime cancelledAt;
+
+    @ManyToOne
+    @JoinColumn(name = "current_turn_team_id")
+    private Team currentTurnTeam;
+
+    @ManyToMany
+    @JoinTable(name = "lobby_banned_maps")
+    private List<GameMap> bannedMaps = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "selected_map_id")
+    private GameMap selectedMap;
+
+    @ManyToMany
+    @JoinTable(name = "lobby_banned_ips")
+    private List<IP> bannedIps = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "selected_ip_id")
+    private GameMap selectedIp;
 
 }

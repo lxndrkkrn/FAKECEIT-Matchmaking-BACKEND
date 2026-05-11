@@ -9,10 +9,12 @@ import org.example.fakeceit.Exception.Client.InvalidValue;
 import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
 import org.example.fakeceit.Repositories.TeamRepository;
 import org.example.fakeceit.Repositories.UserRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,8 +90,6 @@ public class TeamService {
             throw new InvalidValue("Этот игрок не состоит в данной команде");
         }
 
-        team.getPlayers().remove(user);
-
         teamRepository.save(team);
 
         return team;
@@ -137,6 +137,28 @@ public class TeamService {
         teamRepository.save(team);
     }
 
+    public void setTeamSearchState(Long id, Boolean state) {
+        log.info("Попытка установить состояние поиска игры команде");
+        Team team = findTeamById(id);
+
+        team.setIsSearchGame(state);
+    }
+
+    public void setTeamGameState(Long id, Boolean state) {
+        log.info("Попытка установить состояние нахождения в игре команде");
+        Team team = findTeamById(id);
+
+        team.setIsInGame(state);
+    }
+
+    public Optional<Team> findLookingForTeam(Long exceptionTeamId) {
+        return teamRepository.findLookingForTeam(exceptionTeamId);
+    }
+
+    public List<Team> findAllIsSearchGameTrue() {
+        return teamRepository.findAllByIsSearchGameTrue();
+    }
+
     public Team findTeamById(Long id) {
         return teamRepository.findById(id).orElseThrow(() -> new NotFound404("Команда не найдена"));
     }
@@ -146,6 +168,13 @@ public class TeamService {
             return Optional.empty();
         }
         return teamRepository.findById(id);
+    }
+
+    public void enterQuery(Long teamId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NotFound404("Команда не найдена"));
+        team.setIsSearchGame(true);
+
+        log.info("Команда {} начала поиск матча", teamId);
     }
 
 }

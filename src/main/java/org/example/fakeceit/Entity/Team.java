@@ -37,7 +37,13 @@ public class Team {
     private List<User> players = new ArrayList<>();
 
     @NotNull
-    Boolean isWinner;
+    private Boolean isWinner;
+
+    @NotNull
+    private Boolean isSearchGame;
+
+    @NotNull
+    private Boolean isInGame;
 
     @NotNull
     private String name;

@@ -20,6 +20,9 @@ public class GameMap {
     private String name;
 
     @NotNull
+    private Boolean isActive;
+
+    @NotNull
     @URL(message = "Это не ссылка")
     private String iconImg;
 

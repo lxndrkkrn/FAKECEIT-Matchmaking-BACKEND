@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +24,7 @@ public class MapService {
 
     private final MapRepository mapRepository;
 
-    public GameMap createMap(String name, String iconImg, String backgroundImg, String bannerImg) {
+    public GameMap createMap(String name, String iconImg, String backgroundImg, String bannerImg, Boolean state) {
         log.info("Попытка создания карты");
 
         if (mapRepository.existByName(name)) {
@@ -33,6 +37,7 @@ public class MapService {
         gameMap.setIconImg(iconImg);
         gameMap.setBackgroundImg(backgroundImg);
         gameMap.setBannerImg(bannerImg);
+        gameMap.setIsActive(state);
 
         mapRepository.save(gameMap);
 
@@ -45,6 +50,18 @@ public class MapService {
         GameMap gameMap = mapRepository.findById(id).orElseThrow(() -> new NotFound404("Карта не найдена"));
 
         mapRepository.delete(gameMap);
+    }
+
+    public void setIsActive(Long id, Boolean state) {
+        log.info("Попытка изменения статуса карты");
+
+        GameMap gameMap = mapRepository.findById(id).orElseThrow(() -> new NotFound404("Карта не найдена"));
+
+        gameMap.setIsActive(state);
+    }
+
+    public List<GameMap> getActiveMaps(Boolean state) {
+        return mapRepository.findByIsActive(state);
     }
 
     @Transactional(readOnly = true)

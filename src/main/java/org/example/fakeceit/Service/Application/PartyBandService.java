@@ -2,12 +2,14 @@ package org.example.fakeceit.Service.Application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.SSL;
 import org.example.fakeceit.DTOs.Request.Band.DisbandTeamRequestDTO;
+import org.example.fakeceit.DTOs.Request.Band.KickUserRequestDTO;
 import org.example.fakeceit.DTOs.Request.Band.LeaveTheTeamRequestDTO;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
+import org.example.fakeceit.Exception.ClientHTTP.BadRequest400;
 import org.example.fakeceit.Exception.ClientHTTP.Forbidden403;
+import org.example.fakeceit.Exception.ClientHTTP.NotFound404;
 import org.example.fakeceit.Service.Domain.InviteService;
 import org.example.fakeceit.Service.Domain.TeamService;
 import org.example.fakeceit.Service.Domain.UserService;
@@ -65,6 +67,31 @@ public class PartyBandService {
         }
 
         teamService.deleteTeam(team.getId());
+    }
+
+    public void kickUser(KickUserRequestDTO dto) {
+        log.info("Попытка кикнуть игрока из команды");
+
+        User captain = userService.findUserById(dto.captainId());
+        User kicked = userService.findUserById(dto.kickedId());
+        Team team = teamService.findTeamById(dto.teamId());
+
+        boolean isSomeoneSearchingOrPlaying = team.getPlayers().stream()
+                .anyMatch(p -> p.getIsSearchGame() || p.getIsInGame());
+
+        if (!team.getCaptain().equals(captain)) {
+            throw new Forbidden403("Вы не капитан, что бы кикать игрока из команды");
+        }
+
+        if (isSomeoneSearchingOrPlaying) {
+            throw new BadRequest400("Нельзя кикнуть игрока: кто-то из членов команды уже ищет игру или находится в матче");
+        }
+
+        if (captain.equals(kicked)) {
+            throw new BadRequest400("Вы не можете кикнуть сами себя");
+        }
+
+        teamService.removeUserFromTeam(kicked.getId(), team.getId());
     }
 
 }
