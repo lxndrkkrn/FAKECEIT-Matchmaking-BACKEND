@@ -161,4 +161,8 @@ public class LobbyService {
         }
     }
 
+    private void setStateFromAllEntity(Lobby lobby, Team team, User user) {
+
+    }
+
 }

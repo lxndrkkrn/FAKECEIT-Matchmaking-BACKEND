@@ -46,8 +46,19 @@ public class MatchMakingSearcher {
                 .orElse(null);
 
         if (teamB != null) {
+
             teamA.setIsSearchGame(false);
             teamB.setIsSearchGame(false);
+
+            teamA.getPlayers().forEach(plr -> {
+                plr.setIsSearchGame(false);
+                plr.setIsInGame(true);
+            });
+
+            teamB.getPlayers().forEach(plr -> {
+                plr.setIsSearchGame(false);
+                plr.setIsInGame(true);
+            });                                 //VSE CHTO VISHE, NADO BUDET RELOADNUTb
 
             Lobby lobby = lobbyService.createLobby(null, null, teamA.getId(), teamB.getId());
 
