@@ -31,38 +31,33 @@ public class MatchMakingSearcher {
     private final MapService mapService;
 
     @Scheduled(fixedDelay = 5000)
-    public void searchTeams() {
-        List<Team> teams = teamService.findAllIsSearchGameTrue();
+    public Lobby searchTeams() {
+        List<Team> teams = teamService.find2SearchingGame();
 
         if (teams.size() < 2) {
-            return;
+            return null;
         }
 
         Team teamA = teams.getFirst();
+        Team teamB = teams.getLast();
 
-        Team teamB = teams.stream()
-                .filter(t -> !t.getId().equals(teamA.getId()))
-                .findFirst()
-                .orElse(null);
+        teamA.setIsSearchGame(false);
+        teamB.setIsSearchGame(false);
 
-        if (teamB != null) {
+        teamA.getPlayers().forEach(plr -> {
+            plr.setIsSearchGame(false);
+            plr.setIsInGame(true);
+        });
 
-            teamA.setIsSearchGame(false);
-            teamB.setIsSearchGame(false);
+        teamB.getPlayers().forEach(plr -> {
+            plr.setIsSearchGame(false);
+            plr.setIsInGame(true);
+        });
 
-            teamA.getPlayers().forEach(plr -> {
-                plr.setIsSearchGame(false);
-                plr.setIsInGame(true);
-            });
+        Lobby lobby = lobbyService.createLobby(null, null, teamA.getId(), teamB.getId());
 
-            teamB.getPlayers().forEach(plr -> {
-                plr.setIsSearchGame(false);
-                plr.setIsInGame(true);
-            });                                 //VSE CHTO VISHE, NADO BUDET RELOADNUTb
+        log.info("Матч найден: команда {} против команды {}. Лобби: {}", teamA.getId(), teamB.getId(), lobby.getId());
 
-            Lobby lobby = lobbyService.createLobby(null, null, teamA.getId(), teamB.getId());
-
-            log.info("Матч найден: команда {} против команды {}. Лобби: {}", teamA.getId(), teamB.getId(), lobby.getId());
-        }
+        return lobby;
     }
 }

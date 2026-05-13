@@ -155,8 +155,12 @@ public class TeamService {
         return teamRepository.findLookingForTeam(exceptionTeamId);
     }
 
-    public List<Team> findAllIsSearchGameTrue() {
-        return teamRepository.findAllByIsSearchGameTrue();
+    public Team findOneTeamFromUser(Long userId) {
+        return teamRepository.findFirstByPlayerId(userId).orElseThrow(() -> new NotFound404("Вы не состоите ни в одной команде"));
+    }
+
+    public List<Team> find2SearchingGame() {
+        return teamRepository.findLastTeamByPlayerId();
     }
 
     public Team findTeamById(Long id) {

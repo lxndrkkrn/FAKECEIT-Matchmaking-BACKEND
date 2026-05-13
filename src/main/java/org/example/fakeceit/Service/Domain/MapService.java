@@ -27,7 +27,7 @@ public class MapService {
     public GameMap createMap(String name, String iconImg, String backgroundImg, String bannerImg, Boolean state) {
         log.info("Попытка создания карты");
 
-        if (mapRepository.existByName(name)) {
+        if (mapRepository.existsByName(name)) {
             throw new IncorrectName("Это имя уже занято");
         }
 

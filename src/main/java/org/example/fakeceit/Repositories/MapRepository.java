@@ -12,11 +12,11 @@ public interface MapRepository extends JpaRepository<GameMap, Long> {
 
     Optional<GameMap> findByName(String name);
 
-    boolean existByName(String name);
+    boolean existsByName(String name);
 
     List<GameMap> findByIsActive(Boolean isActive);
 
-    @Query("SELECT m FROM GameMaps m WHERE m.id NOT IN " +
+    @Query("SELECT m FROM GameMap m WHERE m.id NOT IN " +
             "(SELECT bm.id FROM Lobby l JOIN l.bannedMaps bm WHERE l.id = :lobbyId)")
     GameMap findRemainingMap(@Param("lobbyId") Long id);
 }

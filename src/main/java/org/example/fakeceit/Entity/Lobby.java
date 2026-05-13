@@ -73,6 +73,6 @@ public class Lobby {
 
     @ManyToOne
     @JoinColumn(name = "selected_ip_id")
-    private GameMap selectedIp;
+    private IP selectedIp;
 
 }
