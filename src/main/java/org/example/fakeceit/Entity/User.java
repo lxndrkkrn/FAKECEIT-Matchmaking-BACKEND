@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.example.fakeceit.Enum.EloLevel;
 import org.example.fakeceit.Enum.UserState;
 import org.hibernate.validator.constraints.Range;
@@ -19,6 +17,9 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "users")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class User {
 

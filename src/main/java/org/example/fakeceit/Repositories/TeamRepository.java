@@ -21,7 +21,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT t FROM Team t WHERE t.isSearchGame = true")
     List<Team> findLastTeamByPlayerId();
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM Team t JOIN t.players p WHERE p.id = :userId ORDER BY t.id DESC")
     Optional<Team> findFirstByPlayerId(@Param("userId") Long userId);
 

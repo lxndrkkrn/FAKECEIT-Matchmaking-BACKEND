@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.fakeceit.DTOs.Request.GameLoop.StartGameRequestDTO;
 import org.example.fakeceit.Entity.Lobby;
+import org.example.fakeceit.Entity.SearchTicket;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.ClientHTTP.Forbidden403;
@@ -26,6 +27,15 @@ public class GameLoopService {
     private final UserService userService;
     private final TeamService teamService;
     private final LobbyService lobbyService;
+    private final SearchTicket searchTicket;
+
+    public void startSearchTeam(Long userId) {
+        User user = userService.findUserById(userId);
+        Team team = teamService.findOneTeamFromUser(user.getId());
+
+        //NOT CREATED
+        //Coming soon...
+    }
 
     public void startSearchGame(Long userId) {
         User user = userService.findUserById(userId);

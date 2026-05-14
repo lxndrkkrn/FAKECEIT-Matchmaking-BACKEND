@@ -3,7 +3,10 @@ package org.example.fakeceit.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.EmbeddedTable;
 
 import java.math.BigDecimal;
@@ -11,6 +14,9 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "statistics")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class Statistic {
 

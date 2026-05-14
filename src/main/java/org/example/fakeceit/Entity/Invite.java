@@ -2,13 +2,18 @@ package org.example.fakeceit.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invites")
-@Data
+@Data@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class Invite {
 
