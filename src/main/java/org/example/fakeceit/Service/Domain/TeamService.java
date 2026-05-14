@@ -181,4 +181,17 @@ public class TeamService {
         log.info("Команда {} начала поиск матча", teamId);
     }
 
+    public void transitionTeamToGame(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new NotFound404("Команда не найдена"));
+
+        team.setIsSearchGame(false);
+        team.setIsInGame(true);
+
+        team.getPlayers().forEach(player -> {
+            player.setIsSearchGame(false);
+            player.setIsInGame(true);
+        });
+    }
+
 }

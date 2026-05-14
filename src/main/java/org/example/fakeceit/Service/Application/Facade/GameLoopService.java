@@ -9,7 +9,9 @@ import org.example.fakeceit.Entity.SearchTicket;
 import org.example.fakeceit.Entity.Team;
 import org.example.fakeceit.Entity.User;
 import org.example.fakeceit.Exception.ClientHTTP.Forbidden403;
+import org.example.fakeceit.Repositories.SearchTicketRepository;
 import org.example.fakeceit.Service.Domain.LobbyService;
+import org.example.fakeceit.Service.Domain.SearchTicketService;
 import org.example.fakeceit.Service.Domain.TeamService;
 import org.example.fakeceit.Service.Domain.UserService;
 import org.springframework.stereotype.Service;
@@ -27,12 +29,20 @@ public class GameLoopService {
     private final UserService userService;
     private final TeamService teamService;
     private final LobbyService lobbyService;
-    private final SearchTicket searchTicket;
+    private final SearchTicketService searchTicketService;
 
     public void startSearchTeam(Long userId) {
         User user = userService.findUserById(userId);
         Team team = teamService.findOneTeamFromUser(user.getId());
 
+        if (team.getPlayers().size() == 5) {
+            startSearchGame(user.getId());
+
+        } else {
+
+            SearchTicket searchTicket = searchTicketService.createSearchTicketPlayer(user, team);
+
+        }
         //NOT CREATED
         //Coming soon...
     }
@@ -45,8 +55,8 @@ public class GameLoopService {
             throw new Forbidden403("Только капитан может начать игру");
         }
 
-        Boolean playersIsInSearch = team.getPlayers().stream().anyMatch(b -> b.getIsSearchGame().equals(true));
-        Boolean playersIsInGame = team.getPlayers().stream().anyMatch(b -> b.getIsInGame().equals(true));
+        Boolean playersIsInSearch = team.getPlayers().stream().anyMatch(User::getIsSearchGame);
+        Boolean playersIsInGame = team.getPlayers().stream().anyMatch(User::getIsInGame);
 
         if (playersIsInSearch || playersIsInGame) {
             throw new Forbidden403("Нельзя начать игру, если её игроки её уже ищут или играют");
@@ -58,6 +68,8 @@ public class GameLoopService {
 
         teamService.setTeamSearchState(team.getId(), true);
         team.getPlayers().forEach(plr -> plr.setIsSearchGame(true));
+
+        SearchTicket searchTicket = searchTicketService.createSearchTicketTeam(team);
 
         log.info("Команда {} (капитан: {}) начала поиск матча", team.getId(), team.getCaptain().getId());
     }

@@ -1,6 +1,6 @@
 package org.example.fakeceit.Enum;
 
-public enum SearchTicketState {
+public enum SearchTicketStateTeam {
 
     ENABLE,
     DISABLE
